@@ -5,10 +5,17 @@ This is a little message hub/mediator that is useful to perform global
 ## Use
 Include src/hub.js into your project.
 
-### Listening for a message.
+### Listen for a specific message.
 
+    // callback is invoked any time `message` is fired.
     // handle is used to turn off the listener.
     var handle = Hub.on(`message`, `callback`, [`context`]);
+
+### Listen for *any* message.
+
+    // callback is invoked any time any message is fired.
+    // handle is used to turn off the listener.
+    var handle = Hub.all(`callback`, [`context`]);
 
 ### Fire a message.
 
