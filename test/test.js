@@ -43,6 +43,11 @@
   asyncTest("different messages", function() {
     var firstTriggered = false;
     var secondTriggered = false;
+    var totalMessages = 0;
+
+    hub.all(function() {
+      totalMessages++;
+    });
 
     hub.on("message1", function() {
       equal(secondTriggered, false, "listener for second message has not been triggered");
@@ -57,22 +62,32 @@
 
     hub.fire("message1");
     hub.fire("message2");
+
+    equal(totalMessages, 2, ".all() handlers receive all messages");
   });
 
   asyncTest("off unregisters listener", function() {
     var firstTriggered = false;
+    var secondTriggered = false;
+
+
+    var id0 = hub.all(function() {
+      ok(false, "this should never be triggered");
+      firstTriggered = true;
+    });
 
     var id1 = hub.on("message", function() {
       ok(false, "this should never be triggered");
-      firstTriggered = false;
+      secondTriggered = true;
     });
 
     var id2 = hub.on("message", function() {
       equal(firstTriggered, false, "first listener was not triggered");
+      equal(secondTriggered, false, "second listener was not triggered");
       start();
     });
 
-
+    hub.off(id0);
     hub.off(id1);
     hub.fire("message");
   });
@@ -81,6 +96,13 @@
     var id = hub.on("message", function(arg1, arg2) {
       equal(arg1, "arg1", "first argument passed correctly");
       equal(arg2, "arg2", "second argument passed correctly");
+      start();
+    });
+
+    hub.all(function(name, arg1, arg2) {
+      equal(name, "message", "message name to .all passed correctly");
+      equal(arg1, "arg1", "first argument to .all passed correctly");
+      equal(arg2, "arg2", "second argument to .all passed correctly");
       start();
     });
 
